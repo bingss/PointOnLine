@@ -1,0 +1,23 @@
+{
+    "name": "界址分歧點提示",
+    "description": "「界址點」與「前後兩點界址點連成直線」之垂距小於容許值，則點號變為紅色，使用於'https://easymap.land.moi.gov.tw/BSWeb/'",
+    "version": "1.0.0",
+    "manifest_version": 3,
+    "icons": {
+		"16": "images/favicon-16x16.png",
+		"32": "images/favicon-32x32.png"
+    },
+	"content_scripts": [
+		{
+		  "run_at": "document_end",
+		  "matches": ["https://easymap.land.moi.gov.tw/*"],
+		  "js":["content_scripts.js"]
+		}
+	  ],
+	  "web_accessible_resources": [
+		  {
+			  "resources":["inject.js"],
+			  "matches":["https://easymap.land.moi.gov.tw/*"]
+		  }
+		]
+}
