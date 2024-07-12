@@ -60,7 +60,7 @@
 		   $.ajax( {
 			   	type : "POST",
 				data:{type:'1',city:city,town:town,sectno:sect,landno:landno,city_name:city_name,town_name:town_name,sect_name:sect_name},
-				// data:{type:'1',city:'B',town:'B24',sectno:'9120',landno:'1267',city_name:'臺中市',town_name:'大肚區',sect_name:'自強段'},
+				// data:{type:'1',city:'B',town:'B24',sectno:'9109',landno:'1351',city_name:'臺中市',town_name:'大肚區',sect_name:'文昌段'},
 			   	url: url,
 			   	error : function(xhr) {
 					//    hideSendMsg();
@@ -90,23 +90,29 @@
 					$.unblockUI();
 					resSplit = response.split("//把所有點位加入陣列做新增，刪減操作");
 					response = resSplit[0]
-						+`var OnStraigtPoint = []; 
-						var OnStraigtPointCoor = [];
-						var PointCoor = [];
-						var PolyInPointCoor = [];
+						+`var StraigtPointAttr = []; 
+						var StraigtPointXY = [];
+						var PointXY = [];
+						var InOrderPointXY = [];
 						var Cadastral_features = Cadastral_source.getFeatures();
+
+					
 						Cadastral_features.forEach( (f)=>{
-							PointCoor.push(f.getGeometry().getCoordinates()[0]+','+f.getGeometry().getCoordinates()[1]);
+							// console.log(f.get('ATTR')+'--'+f.getGeometry().getCoordinates()[0]+','+f.getGeometry().getCoordinates()[1]);
+							PointXY.push(f.getGeometry().getCoordinates()[0]+','+f.getGeometry().getCoordinates()[1]);
 						});
+
 						map_Cadastral_source.getFeatures().forEach( (f)=>{
 							if( f.get("COLOR") == "true" ){
-								PolyInPointCoor = PolyInPointCoor.concat( f.getGeometry().getCoordinates()[0].filter( (val) =>PointCoor.includes( val[0]+','+val[1] ) )) ;
-								console.log(PolyInPointCoor);
+								f.getGeometry().getCoordinates().forEach( (f2)=>{									
+									InOrderPointXY[InOrderPointXY.length] = f2.filter( (val) => PointXY.includes( val[0]+','+val[1] ));
+								});
 							}
 						});
-						OnStraigtCoorPush();
+						// console.log(InOrderPointXY);
+						StraigtPointXYPush();
 						var  createTextStyle2 = function(feature, resolution) {
-							let fontColor = OnStraigtPoint.includes( feature.get('ATTR'))==true ? '#FF0000' : '#000000'; 
+							let fontColor = StraigtPointAttr.includes( feature.get('ATTR'))==true ? '#FF0000' : '#000000'; 
 							var align = 'center';
 							var baseline = 'middle';
 							var offsetX = 0;var offsetY = -18;
@@ -140,8 +146,8 @@
 							});
 						};
 						Cadastral_features.forEach( (f)=>{
-							if( OnStraigtPointCoor.includes( (f.getGeometry().getCoordinates()[0]+','+f.getGeometry().getCoordinates()[1])) ){
-								OnStraigtPoint.push(f?.get('ATTR'));
+							if( StraigtPointXY.includes( (f.getGeometry().getCoordinates()[0]+','+f.getGeometry().getCoordinates()[1])) ){
+								StraigtPointAttr.push(f?.get('ATTR'));
 							}
 							f.setStyle(CadastralStyleSelectFunction(f));
 							send_point.push(f.get("ATTR"));
@@ -156,10 +162,10 @@
 								alert('容許值請輸入數字');
 								return;
 							}
-							OnStraigtCoorPush();
+							StraigtPointXYPush();
 							Cadastral_features.forEach( (f)=>{
-								if( OnStraigtPointCoor.includes( (f.getGeometry().getCoordinates()[0]+','+f.getGeometry().getCoordinates()[1])) ){
-									OnStraigtPoint.push(f?.get('ATTR'));
+								if( StraigtPointXY.includes( (f.getGeometry().getCoordinates()[0]+','+f.getGeometry().getCoordinates()[1])) ){
+									StraigtPointAttr.push(f?.get('ATTR'));
 								}
 								if( send_point.includes( f.get("ATTR") ) ){
 									f.setStyle( CadastralStyleSelectFunction(f) );
@@ -184,15 +190,20 @@
 							let cross = Math.abs( dx * (val[1] - pre[1]) - dy * (val[0] - pre[0]) );
 							return cross / Math.sqrt(dx*dx + dy*dy);
 						}
-						function OnStraigtCoorPush(){
-							OnStraigtPointCoor = [];
-							OnStraigtPoint = [];
-							PolyInPointCoor.forEach( (val, idx, array) =>{
-								let pre = array[idx-1] || array[array.length - idx - 2];
-								let next = array[idx+1] || array[1];
-								if( base_height(val,pre,next) < ( $('#inputCm').val()/100 ) ){
-									OnStraigtPointCoor.push(val[0]+','+val[1]);
-								} 
+
+						function StraigtPointXYPush(){
+							StraigtPointXY = [];
+							StraigtPointAttr = [];
+							InOrderPointXY.forEach( (PolyPoint) =>{
+								console.log(PolyPoint);
+								PolyPoint.forEach(	(val, idx, array) =>{
+									let pre = array[idx-1] || array[array.length - idx - 2];
+									let next = array[idx+1] || array[1];
+									// console.log(pre+'---'+val+'---'+next);
+									if( base_height(val,pre,next) < ( $('#inputCm').val()/100 ) ){
+										StraigtPointXY.push(val[0]+','+val[1]);
+									}
+								});
 							});
 						}`
 						+resSplit[2];
