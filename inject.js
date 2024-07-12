@@ -195,7 +195,7 @@
 							StraigtPointXY = [];
 							StraigtPointAttr = [];
 							InOrderPointXY.forEach( (PolyPoint) =>{
-								console.log(PolyPoint);
+								// console.log(PolyPoint);
 								PolyPoint.forEach(	(val, idx, array) =>{
 									let pre = array[idx-1] || array[array.length - idx - 2];
 									let next = array[idx+1] || array[1];
