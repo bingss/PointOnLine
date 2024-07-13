@@ -60,7 +60,7 @@
 		   $.ajax( {
 			   	type : "POST",
 				data:{type:'1',city:city,town:town,sectno:sect,landno:landno,city_name:city_name,town_name:town_name,sect_name:sect_name},
-				// data:{type:'1',city:'B',town:'B24',sectno:'9109',landno:'1351',city_name:'臺中市',town_name:'大肚區',sect_name:'文昌段'},
+				// data:{type:'1',city:'B',town:'B25',sectno:'9336',landno:'544',city_name:'臺中市',town_name:'龍井區',sect_name:'竹師段'},
 			   	url: url,
 			   	error : function(xhr) {
 					//    hideSendMsg();
@@ -93,23 +93,28 @@
 						+`var StraigtPointAttr = []; 
 						var StraigtPointXY = [];
 						var PointXY = [];
-						var InOrderPointXY = [];
+						var InOrderPointCoor = [];
 						var Cadastral_features = Cadastral_source.getFeatures();
 
-					
 						Cadastral_features.forEach( (f)=>{
 							// console.log(f.get('ATTR')+'--'+f.getGeometry().getCoordinates()[0]+','+f.getGeometry().getCoordinates()[1]);
-							PointXY.push(f.getGeometry().getCoordinates()[0]+','+f.getGeometry().getCoordinates()[1]);
+							PointXY.push(f.getGeometry().getCoordinates().toString());
 						});
+
+						// console.log(map_Cadastral_source.getFeatures().getGeometry().getCoordinates());
+						// let InOrderPointCoorString=''; //找圓弧不在多邊形上的點使用
 
 						map_Cadastral_source.getFeatures().forEach( (f)=>{
 							if( f.get("COLOR") == "true" ){
-								f.getGeometry().getCoordinates().forEach( (f2)=>{									
-									InOrderPointXY[InOrderPointXY.length] = f2.filter( (val) => PointXY.includes( val[0]+','+val[1] ));
+								f.getGeometry().getCoordinates().forEach( (f2)=>{	
+									InOrderPointCoor[InOrderPointCoor.length] = f2.filter( (val) => PointXY.includes( val[0]+','+val[1] ) );
+									// InOrderPointCoorString += InOrderPointCoor[InOrderPointCoor.length-1].toString();//找圓弧不在多邊形上的點使用
 								});
 							}
 						});
-						// console.log(InOrderPointXY);
+						// NotInPolyPointXY = PointXY.filter( (val) => !(InOrderPointCoorString.includes(val)));//找圓弧不在多邊形上的點使用
+						// console.log(NotInPolyPointXY);//找圓弧不在多邊形上的點使用
+
 						StraigtPointXYPush();
 						var  createTextStyle2 = function(feature, resolution) {
 							let fontColor = StraigtPointAttr.includes( feature.get('ATTR'))==true ? '#FF0000' : '#000000'; 
@@ -194,7 +199,7 @@
 						function StraigtPointXYPush(){
 							StraigtPointXY = [];
 							StraigtPointAttr = [];
-							InOrderPointXY.forEach( (PolyPoint) =>{
+							InOrderPointCoor.forEach( (PolyPoint) =>{
 								// console.log(PolyPoint);
 								PolyPoint.forEach(	(val, idx, array) =>{
 									let pre = array[idx-1] || array[array.length - idx - 2];
